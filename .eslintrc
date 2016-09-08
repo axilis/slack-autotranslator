@@ -1,0 +1,29 @@
+{
+  "env": {
+    "node": true,
+    "commonjs": true,
+    "es6": true
+  },
+  "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    },
+    "sourceType": "module"
+  },,
+  "rules": {
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["warn", "single"],
+    "semi": [ "warn", "always" ],
+    "arrow-parens": ["error", "always"],
+    "quote-props": ["error", "consistent-as-needed", {
+      "keywords": true
+    }],
+    "prefer-const": ["warn", {
+      "destructuring": "any",
+      "ignoreReadBeforeAssign": false
+    }],
+    "no-console": ["warn"]
+  }
+}
