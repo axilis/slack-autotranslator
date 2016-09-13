@@ -12,9 +12,10 @@ class Translator {
     }
   }
 
+  // Attempts to translate falling back to original text
   translate(text, targetLang) {
 
-    return this.detectLanguage(text)
+    return this._detectLanguage(text)
       .then((sourceLang) => {
         if (sourceLang !== targetLang) {
           return this.api.translate(text, sourceLang, targetLang);
@@ -22,14 +23,14 @@ class Translator {
           return text;
         }
       })
-      // If it is not possible to translate, just return original
+      // If it failed to translate, just return original
       .catch(() => {
         return text;
       });
 
   }
 
-  detectLanguage(text) {
+  _detectLanguage(text) {
 
     if (this.languageGuesser) {
       return this.languageGuesser.guess(text).catch(() => {

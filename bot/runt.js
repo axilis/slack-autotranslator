@@ -32,7 +32,7 @@ const t = new Translator({
   }
 });
 
-t.translate("Hello, what are you doing?", 'hr').then((data) => {
+t.translate("Hello, what are you doing?", 'en').then((data) => {
   console.log(data);
 }).catch((err) => {
   console.log(err);

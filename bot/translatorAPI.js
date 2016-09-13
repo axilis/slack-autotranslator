@@ -16,25 +16,24 @@ class TranslatorAPI {
     this.client_id = client_id;
     this.client_secret = client_secret;
     this.accessToken = null;
-    this.accessTokenValid = false;
+    this.accessTokenExpiration = new Date();
   }
 
   // Ensures that function will be executed in context that has valid token
   _ensureValidToken(next) {
 
-    if (this.accessToken !== null && this.accessTokenValid) {
+    if (this.accessToken !== null && this.accessTokenValid < new Date()) {
       return next();
     }
 
     return this._authorize(this.client_id, this.client_secret)
       .then((data) => {
-        this.accessToken = `Bearer ${data.access_token}`;
-        this.accessTokenValid = true;
+        const currentTime = new Date().getTime();
+        const offset = (data.expires_in - 5) * 1000;
+        const expirationDate = new Date(currentTime + offset);
 
-        // Ensure token status when it expires
-        setTimeout(() => {
-          this.accessTokenValid = false;
-        }, (data.expires_in - 5) * 1000);
+        this.accessToken = `Bearer ${data.access_token}`;
+        this.accessTokenExpiratio = expirationDate;
 
         return next();
       });

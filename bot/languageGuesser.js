@@ -1,5 +1,6 @@
 const DEFAULT_THRESHOLD = 0.15;
 
+// Attempts to guess language based on words and letters provided by user.
 class LanguageGuesser {
 
   constructor(settings) {
