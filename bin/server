@@ -21,7 +21,7 @@ if (process.env.SSL_CA) {
   options.ca = fs.readFileSync(process.env.SSL_CA);
 }
 
-var server = https.createServer(app, options);
+var server = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
