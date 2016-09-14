@@ -1,21 +1,8 @@
-const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
+
+const sqlite3 = require('sqlite3').verbose();
 const Promise = require('bluebird');
-
-class Message {
-
-  constructor(channel, user, name, color, text, translation, ts) {
-    this.channel = channel;
-    this.user = user;
-    this.name = name;
-    this.color = color;
-    this.text = text;
-    this.translation = translation;
-    this.ts = ts;
-  }
-
-}
 
 
 class Database {
@@ -97,6 +84,4 @@ class Database {
 
 }
 
-module.exports = {
-  Message, Database
-};
+module.exports = Database;

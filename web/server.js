@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const app = require('../app');
+const app = require('./app');
 const debug = require('debug')('slack-autotranslator:server');
 const https = require('https');
 const http = require('http');

@@ -1,6 +1,7 @@
 const TranslatorAPI = require('./translatorAPI');
 const LanguageGuesser = require('./languageGuesser');
 
+
 class Translator {
 
   constructor(settings) {
@@ -54,5 +55,6 @@ class Translator {
   }
 
 }
+
 
 module.exports = Translator;

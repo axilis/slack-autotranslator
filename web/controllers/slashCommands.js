@@ -1,9 +1,12 @@
 
-const deleteCommand = function(req, res) {
+function deleteCommand(req, res) {
 
   const hours = req.body.text;
   const channel = req.body.channel_id;
-  const since = new Date((new Date()).getTime() - 3600 * 1000 * hours);
+
+  const now = (new Date()).getTime();
+  const time = now - 1000 * 3600 * hours;
+  const since = new Date(time);
 
   req.app.get('database').clearMessages(channel, since);
 
@@ -19,11 +22,10 @@ const deleteCommand = function(req, res) {
     });
   }
 
-};
+}
 
 
-
-const formatMessages = function(messages) {
+function formatMessages(messages) {
   let lastAuthor = null;
   const attachments = [];
 
@@ -43,10 +45,9 @@ const formatMessages = function(messages) {
     attachments.push(entry);
   }
   return attachments;
-};
+}
 
-
-const recentCommand = function(req, res) {
+function recentCommand(req, res) {
   const channel = req.body.channel_id;
   const count = req.body.text;
 
@@ -73,19 +74,17 @@ const recentCommand = function(req, res) {
       });
     });
 
-};
+}
 
 
-
-const translationsCommand = function(req, res) {
+function translationsCommand(req, res) {
   const historyURL = req.app.get('historyURL');
   const args = '/' + req.body.channel_id + '?token=' + req.body.token;
 
   res.json({
     text: 'You can view translations ' + historyURL + args
   });
-};
-
+}
 
 
 module.exports = {

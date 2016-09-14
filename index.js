@@ -1,9 +1,9 @@
-require('dotenv').config({path: '../.env'});
+require('dotenv').config();
 
-const Translator = require('./translator');
-const TranslatorBot = require('./translatorbot');
-const Database = require('../database').Database;
-const WebServer = require('../bin/server');
+const Translator = require('./bot/translator');
+const TranslatorBot = require('./bot/translatorBot');
+const Database = require('./database');
+const WebServer = require('./web/server');
 
 const translator = new Translator({
   clientId: process.env.TRANSLATOR_ID,
@@ -36,7 +36,7 @@ const translator = new Translator({
 });
 
 try {
-  const db = new Database('../../');
+  const db = new Database('../');
   const bot = new TranslatorBot({
     token: process.env.BOT_TOKEN,
     name: process.env.BOT_NAME,

@@ -1,5 +1,6 @@
 const DEFAULT_THRESHOLD = 0.15;
 
+
 // Attempts to guess language based on words and letters provided by user.
 class LanguageGuesser {
 
@@ -92,5 +93,6 @@ class LanguageGuesser {
     return matching / content.length;
   }
 }
+
 
 module.exports = LanguageGuesser;

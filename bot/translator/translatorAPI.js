@@ -1,5 +1,5 @@
-const axios = require('axios');
 const qs = require('querystring');
+const axios = require('axios');
 
 
 function stripBOM(string) {
@@ -98,5 +98,6 @@ class TranslatorAPI {
   }
 
 }
+
 
 module.exports = TranslatorAPI;

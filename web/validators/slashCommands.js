@@ -1,8 +1,8 @@
+
 const MESSAGE_LIMIT = 80;
 
 
-
-const tokenValidator = function(name) {
+function tokenValidator(name) {
   return function(req, res, next) {
     if (req.body.token !== req.app.get(name)) {
       return res.json({
@@ -11,11 +11,10 @@ const tokenValidator = function(name) {
     }
     return next();
   };
-};
+}
 
 
-
-const recentValidator = function(req, res, next) {
+function recentValidator(req, res, next) {
   let count = 15;
 
   if (req.body.text.trim().length != 0) {
@@ -35,11 +34,10 @@ const recentValidator = function(req, res, next) {
 
   req.body.text = count;
   return next();
-};
+}
 
 
-
-const deleteValidator = function(req, res, next) {
+function deleteValidator(req, res, next) {
   let hours = 1;
 
   if (req.body.text.trim().length != 0) {
@@ -55,8 +53,7 @@ const deleteValidator = function(req, res, next) {
 
   req.body.text = hours;
   return next();
-};
-
+}
 
 
 module.exports = {
