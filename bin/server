@@ -3,6 +3,7 @@
 const app = require('../app');
 const debug = require('debug')('slack-autotranslator:server');
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 
 const port = normalizePort(process.env.PORT || '3000');
@@ -12,20 +13,28 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-const options = {
-  key: fs.readFileSync(process.env.SSL_KEY),
-  cert: fs.readFileSync(process.env.SSL_CERT)
-};
+var server;
 
-if (process.env.SSL_CA) {
-  options.ca = fs.readFileSync(process.env.SSL_CA);
+if (process.env.PRODUCTION.toLowerCase() === "true") {
+  const options = {
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CERT)
+  };
+
+  if (process.env.SSL_CA) {
+    options.ca = fs.readFileSync(process.env.SSL_CA);
+  }
+
+  server = https.createServer(options, app);
+} else {
+  server = http.createServer(app);
 }
-
-var server = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
+
+module.exports = app;
 
 server.listen(port);
 server.on('error', onError);

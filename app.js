@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 
 var express = require('express');
 var path = require('path');
@@ -23,8 +23,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// Ensure short keep-alive to enable server to restart itself for SSL
+app.use(function(req, res, next) {
+  res.set('Connection', 'Keep-Alive');
+  res.set('Keep-Alive', 'timeout=10');
+  res.socket.setTimeout(12000);
+  return next();
+});
+
 app.use('/slack', slack);
-app.use('/history', history);
+app.use(process.env.HISTORY_URL, history);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

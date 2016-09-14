@@ -4,6 +4,17 @@ const LanguageGuesser = require('./languageGuesser');
 class Translator {
 
   constructor(settings) {
+
+    if (!settings.clientId) {
+      console.log('Missing clientId argument.');
+      process.exit(-1);
+    }
+
+    if (!settings.clientSecret) {
+      console.log('Missing clientSecret argument.');
+      process.exit(-1);
+    }
+
     this.settings = settings;
     this.api = new TranslatorAPI(settings.clientId, settings.clientSecret);
 

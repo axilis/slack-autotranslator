@@ -1,5 +1,5 @@
-
-var Bot = require('slackbots');
+const Message = require('../database').Message;
+const Bot = require('slackbots');
 
 
 const CHANNEL_ACTIONS = [
@@ -18,6 +18,11 @@ const GROUP_ACTIONS = [
   'group_unarchive'
 ];
 
+const MESSAGE_ACTIONS = [
+  'message_changed',
+  'message_deleted'
+];
+
 function isChannelAction(message) {
   return CHANNEL_ACTIONS.includes(message.type);
 }
@@ -30,6 +35,10 @@ function isUserAction(message) {
   return message.type === 'user_change';
 }
 
+function isMessageAction(message) {
+  return message.type === 'message' && MESSAGE_ACTIONS.includes(message.subtype);
+}
+
 function isMessage(message) {
   return message.type === 'message' && message.text;
 }
@@ -38,8 +47,13 @@ function isMessage(message) {
 class TranslatorBot extends Bot {
   constructor(settings) {
     super(settings);
-    this.on('start', this.onStart);
-    this.on('message', this.onMessage);
+
+    this.translator = settings.translator;
+    this.targetLanguage = settings.targetLanguage;
+    this.db = settings.database;
+
+    this.on('start', this.onStart.bind(this));
+    this.on('message', this.onMessage.bind(this));
   }
 
   onStart() {
@@ -48,6 +62,10 @@ class TranslatorBot extends Bot {
       return user.name === name;
     })[0];
     console.log(name);
+  }
+
+  getUserById(userId) {
+    return this.users.filter((user) => user.id == userId)[0];
   }
 
   onMessage(message) {
@@ -69,6 +87,20 @@ class TranslatorBot extends Bot {
       });
     }
 
+    // Handle message change actions
+    else if (isMessageAction(message)) {
+      if (message.subtype === 'message_changed') {
+        this.db.deleteMessage(message.channel, message.previous_message);
+
+        // Let it fall trough to normal message handler
+        message.message.channel = message.channel;
+        message = message.message;
+        this.processMessage(message);
+      } else if (message.subtype === 'message_deleted') {
+        this.db.deleteMessage(message.channel, message.previous_message);
+      }
+    }
+
     // It it is only message
     else if (isMessage(message)) {
       this.processMessage(message);
@@ -76,10 +108,26 @@ class TranslatorBot extends Bot {
   }
 
   processMessage(message) {
-    if (message.subtype) {
-      // it is certainly on english
-    }
-    console.log(message);
+
+    this.translator.translate(message.text, this.targetLanguage)
+      .then((translated) => {
+        const user = this.getUserById(message.user);
+
+        this.db.storeMessage(new Message(
+          message.channel,
+          message.user,
+          user.real_name || '[unknown]',
+          '#' + user.color || '#aaaaaa',
+          message.text,
+          translated,
+          message.ts
+        ));
+
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
   }
 }
 

@@ -1,9 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+
+router.get('/:channel', function(req, res) {
+
+  req.app.get('database').getAllMessages(req.params.channel)
+    .then((data) => {
+      res.json(data);
+    });
+
 });
 
 module.exports = router;
