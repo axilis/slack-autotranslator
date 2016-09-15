@@ -11,6 +11,11 @@ var history = require('./routes/history');
 
 var app = express();
 
+const TokenValidator = require('./validators/authorizationToken').TokenValidator;
+const tokenValidator = new TokenValidator(process.env.TRANSLATOR_SECRET);
+
+app.set('tokenValidator', tokenValidator);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

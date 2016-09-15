@@ -29,20 +29,26 @@ function formatMessages(messages) {
   let lastAuthor = null;
   const attachments = [];
 
+  let entry;
+
   for (const message of messages) {
-    const entry = {
-      fallback: message.translation,
-      text: message.translation,
-      mrkdwn_in: ['text'],
-      color: message.color
-    };
 
     if (message.user != lastAuthor) {
       lastAuthor = message.user;
-      entry.title = message.name;
+      entry = {
+        fallback: message.translation,
+        text: message.translation,
+        title: message.name,
+        mrkdwn_in: ['text'],
+        color: message.color
+      };
+      attachments.push(entry);
+    } else {
+      // Append to last message
+      entry.fallback += '\n' + message.translation;
+      entry.text += '\n' + message.translation;
     }
 
-    attachments.push(entry);
   }
   return attachments;
 }
@@ -79,7 +85,8 @@ function recentCommand(req, res) {
 
 function translationsCommand(req, res) {
   const historyURL = req.app.get('historyURL');
-  const args = '/' + req.body.channel_id + '?token=' + req.body.token;
+  const [token, random] = req.app.get('tokenValidator').generateToken();
+  const args = '/' + req.body.channel_id + '?token=' + token + '&random=' + random;
 
   res.json({
     text: 'You can view translations ' + historyURL + args
