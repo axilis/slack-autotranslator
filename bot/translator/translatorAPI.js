@@ -91,7 +91,7 @@ class TranslatorAPI {
         }
       })
       .then((resp) => {
-        return resp.data;
+        return JSON.parse(stripBOM(resp.data));
       });
     });
 

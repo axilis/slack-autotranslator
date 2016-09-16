@@ -1,8 +1,21 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
+body, pre {
+  padding: 10px;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+p {
+  margin: 0;
+  padding: 3px 0;
+}
+
+pre {
+  margin: 0 0 5px;
+  padding: 0;
+}
+
+.original {
+  display: none;
+  padding: 10px;
+  border: 1px solid #ccc;
 }

@@ -22,7 +22,16 @@ router.use(function(req, res, next) {
 
   // Close all slack connections.
   res.set('Connection', 'Close');
-  return next();
+
+  // Wrap call of slack functions so user gets nice message
+  try {
+    return next();
+  } catch(err) {
+    console.error(err);
+    return res.json({
+      text: 'There was an error while executing command. Please check server logs.'
+    });
+  }
 });
 
 router.post('/delete', tokenValidator('TOKEN_DELETE'), deleteValidator, deleteCommand);

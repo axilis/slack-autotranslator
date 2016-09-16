@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
-    <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+    <title>Transcription</title>
+    <script src="/javascripts/jquery-3.1.0.min.js"></script>
+    <script src="/javascripts/moment.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('.translation').click(function() {
+          $(this).next().filter('.original').toggle();
+        });
+
+        $('time').each(function(obj) {
+          var content = $(this).html();
+          var date = parseInt(content);
+          $(this).html(moment(date * 1000).fromNow());
+        })
+      });
+    </script>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <% for (message of messages) { %>
+      <p>
+        <b style="color: <%= message.color %>"><%= message.name %></b> (<time><%= message.ts %></time>):
+      </p>
+      <pre class="translation"><%= message.translation %></pre>
+      <pre class="original"><%= message.text %></pre>
+    <% } %>
   </body>
 </html>

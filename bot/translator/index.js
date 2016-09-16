@@ -7,13 +7,11 @@ class Translator {
   constructor(settings) {
 
     if (!settings.clientId) {
-      console.log('Missing clientId argument.');
-      process.exit(-1);
+      throw new Error('Missing clientId argument.');
     }
 
     if (!settings.clientSecret) {
-      console.log('Missing clientSecret argument.');
-      process.exit(-1);
+      throw new Error('Missing clientSecret argument.');
     }
 
     this.settings = settings;

@@ -26,31 +26,15 @@ function deleteCommand(req, res) {
 
 
 function formatMessages(messages) {
-  let lastAuthor = null;
-  const attachments = [];
-
-  let entry;
-
-  for (const message of messages) {
-
-    if (message.user != lastAuthor) {
-      lastAuthor = message.user;
-      entry = {
-        fallback: message.translation,
-        text: message.translation,
-        title: message.name,
-        mrkdwn_in: ['text'],
-        color: message.color
-      };
-      attachments.push(entry);
-    } else {
-      // Append to last message
-      entry.fallback += '\n' + message.translation;
-      entry.text += '\n' + message.translation;
-    }
-
-  }
-  return attachments;
+  return messages.map((message) => {
+    return {
+      fallback: message.translation,
+      text: message.translation,
+      title: message.name,
+      mrkdwn_in: ['text'],
+      color: message.color
+    };
+  });
 }
 
 function recentCommand(req, res) {
@@ -68,29 +52,39 @@ function recentCommand(req, res) {
         });
       } else {
         return res.json({
-          text: 'No messages stored yet.'
+          text: 'No messages stored yet.\nCheck if bot is added to conversation.'
         });
       }
 
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.json({
-        text: 'There was an error while executing command. Please check server logs.'
-      });
     });
 
 }
 
 
 function translationsCommand(req, res) {
-  const historyURL = req.app.get('historyURL');
-  const [token, random] = req.app.get('tokenValidator').generateToken();
-  const args = '/' + req.body.channel_id + '?token=' + token + '&random=' + random;
+  const channel = req.body.channel_id;
 
-  res.json({
-    text: 'You can view translations ' + historyURL + args
-  });
+  req.app.get('database').getRecentMessages(channel, 1)
+    .then((messages) => {
+
+      if (messages.length == 0) {
+        return res.json({
+          text: 'No messages stored yet.\nCheck if bot is added to conversation.'
+        });
+      }
+
+      else {
+        const historyURL = req.app.get('historyURL');
+        const [token, random] = req.app.get('tokenValidator').generateToken();
+        const args = '/' + req.body.channel_id + '?token=' + token + '&random=' + random;
+
+        return res.json({
+          text: 'You can view translations ' + historyURL + args
+        });
+      }
+
+    });
+
 }
 
 

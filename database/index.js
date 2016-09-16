@@ -49,12 +49,47 @@ class Database {
   }
 
 
+  _filterOutLast(messages, limit) {
+    let lastAuthor = null;
+    const selected = [];
+
+    let entry;
+    let counter = 0;
+
+    for (const message of messages) {
+
+      if (message.user != lastAuthor) {
+        counter += 1;
+        lastAuthor = message.user;
+        entry = message;
+
+        if (counter > limit) {
+          break;
+        }
+
+        selected.push(entry);
+      } else {
+        // Append row to last message
+        entry.translation = message.translation + '\n' + entry.translation;
+      }
+
+    }
+    return selected;
+  }
+
   getRecentMessages(channel, limit) {
     const q = Promise.promisify(this.db.all, { context: this.db });
     return q(
       'SELECT * FROM messages WHERE channel = ? ORDER BY ts DESC LIMIT ?',
-      [ channel, limit ]
-    ).then((rows) => rows.sort((a, b) => a.ts - b.ts ));
+      [ channel, limit * 7 ]
+      // This constant is to ensure enough rows gets fetched so when
+      // combined they end up as given number of messages.
+      // This wouldn't work when messages on average have more than 7 rows,
+      // but in all cases we observed that doesn't occour.
+      // Should be improved in future but for prototype it is fine.
+    )
+    .then((rows) => { return this._filterOutLast(rows, limit); })
+    .then((rows) => rows.sort((a, b) => a.ts - b.ts ));
   }
 
   getAllMessages(channel) {
