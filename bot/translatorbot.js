@@ -41,7 +41,7 @@ class TranslatorBot extends Bot {
     }
     else if (isUserAction(event)) {
       this._api('users.list').then((users) => {
-        this.users = users.users;
+        this.users = users.members;
       });
     }
 
