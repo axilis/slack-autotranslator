@@ -35,8 +35,17 @@ const translator = new Translator({
   }
 });
 
+function startDatabaseCleaningService(db) {
+  const INTERVAL = 60 * 1000;
+  setInterval(function() {
+    db.clearOld();
+  }, INTERVAL);
+}
+
 try {
   const db = new Database('../');
+  startDatabaseCleaningService(db);
+
   const bot = new TranslatorBot({
     token: process.env.BOT_TOKEN,
     name: process.env.BOT_NAME,
@@ -51,6 +60,12 @@ try {
   WebServer.set('TOKEN_TRANSLATIONS', process.env.TOKEN_TRANSLATIONS);
   WebServer.set('TOKEN_RECENT', process.env.TOKEN_RECENT);
   WebServer.set('TOKEN_DELETE', process.env.TOKEN_DELETE);
+
+  process.on('SIGTERM', function () {
+    db.close();
+    process.exit(0);
+  });
+
 
 } catch(err) {
   console.error(err);

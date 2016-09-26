@@ -15,20 +15,42 @@ app.set('port', port);
 
 var server;
 
-if (process.env.PRODUCTION.toLowerCase() === "true") {
-  const options = {
-    key: fs.readFileSync(process.env.SSL_KEY),
-    cert: fs.readFileSync(process.env.SSL_CERT)
-  };
 
-  if (process.env.SSL_CA) {
-    options.ca = fs.readFileSync(process.env.SSL_CA);
+function createServer() {
+  if (process.env.PRODUCTION.toLowerCase() === 'true') {
+    const options = {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT)
+    };
+
+    if (process.env.SSL_CA) {
+      options.ca = fs.readFileSync(process.env.SSL_CA);
+    }
+
+    return https.createServer(options, app);
+  } else {
+    return http.createServer(app);
   }
-
-  server = https.createServer(options, app);
-} else {
-  server = http.createServer(app);
 }
+
+function startServer() {
+  const server = createServer();
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+  return server;
+}
+
+server = startServer();
+
+// Restart server every few days to ensure SSL certificates are up to date
+const INTERVAL = 1000 * 60 * 60 * 24 * 3; // every 3 days
+setInterval(function() {
+  server.close(function() {
+    server = startServer();
+  });
+
+}, INTERVAL);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -36,9 +58,6 @@ if (process.env.PRODUCTION.toLowerCase() === "true") {
 
 module.exports = app;
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.

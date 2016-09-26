@@ -27,13 +27,19 @@ function deleteCommand(req, res) {
 
 function formatMessages(messages) {
   return messages.map((message) => {
-    return {
+    let element = {
       fallback: message.translation,
       text: message.translation,
       title: message.name,
       mrkdwn_in: ['text'],
       color: message.color
     };
+
+    if (message.translation !== message.original) {
+      element.footer = "Translated";
+    }
+
+    return element;
   });
 }
 
