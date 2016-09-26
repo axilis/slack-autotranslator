@@ -15,7 +15,7 @@ function tokenValidator(name) {
 
 
 function recentValidator(req, res, next) {
-  let count = 15;
+  let count = 3;
 
   if (req.body.text.trim().length != 0) {
     count = parseInt(req.body.text);

@@ -27,7 +27,7 @@ function deleteCommand(req, res) {
 
 function formatMessages(messages) {
   return messages.map((message) => {
-    let element = {
+    const element = {
       fallback: message.translation,
       text: message.translation,
       title: message.name,
@@ -35,8 +35,8 @@ function formatMessages(messages) {
       color: message.color
     };
 
-    if (message.translation !== message.original) {
-      element.footer = "Translated";
+    if (message.translation !== message.text) {
+      element.footer = 'Translated';
     }
 
     return element;
