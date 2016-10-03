@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const RESTART_INTERVAL = 1000 * 60 * 60 * 24 * 3; // every 3 days
+
 const app = require('./app');
 const debug = require('debug')('slack-autotranslator:server');
 const https = require('https');
@@ -9,15 +11,16 @@ const fs = require('fs');
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
+// Create HTTP or HTTPS server depending on environment
 var server;
 
-
 function createServer() {
-  if (process.env.PRODUCTION.toLowerCase() === 'true') {
+  if (process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === 'true') {
+
+    if (!process.env.SSL_KEY || !process.env.SSL_CERT) {
+      throw new Error('SSL_KEY and SSL_CERT must be defined!');
+    }
+
     const options = {
       key: fs.readFileSync(process.env.SSL_KEY),
       cert: fs.readFileSync(process.env.SSL_CERT)
@@ -44,17 +47,13 @@ function startServer() {
 server = startServer();
 
 // Restart server every few days to ensure SSL certificates are up to date
-const INTERVAL = 1000 * 60 * 60 * 24 * 3; // every 3 days
 setInterval(function() {
   server.close(function() {
     server = startServer();
   });
 
-}, INTERVAL);
+}, RESTART_INTERVAL);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
 
 module.exports = app;
 

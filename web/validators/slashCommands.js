@@ -1,5 +1,5 @@
 
-const MESSAGE_LIMIT = 80;
+const MESSAGE_LIMIT = 50;
 
 
 function tokenValidator(name) {

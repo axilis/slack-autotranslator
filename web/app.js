@@ -11,9 +11,13 @@ var history = require('./routes/history');
 
 var app = express();
 
+
+if (!process.env.TRANSLATOR_SECRET) {
+  throw new Error('Missing TRANSLATOR_SECRET variable.');
+}
+
 const TokenValidator = require('./validators/authorizationToken').TokenValidator;
 const tokenValidator = new TokenValidator(process.env.TRANSLATOR_SECRET);
-
 app.set('tokenValidator', tokenValidator);
 
 // view engine setup
@@ -37,8 +41,14 @@ app.use(function(req, res, next) {
   return next();
 });
 
+
+if (!process.env.HISTORY_URL) {
+  throw new Error('Missing HISTORY_URL variable!');
+}
+
 app.use('/slack', slack);
 app.use(process.env.HISTORY_URL, history);
+app.set('historyURL', process.env.HISTORY_URL);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

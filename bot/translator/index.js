@@ -19,6 +19,8 @@ class Translator {
 
     if (settings.guesser) {
       this.languageGuesser = new LanguageGuesser(settings.guesser);
+    } else {
+      console.log('Using language guesser could benefit API call limits.');
     }
   }
 

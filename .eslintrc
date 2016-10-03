@@ -24,6 +24,6 @@
       "destructuring": "any",
       "ignoreReadBeforeAssign": false
     }],
-    "no-console": ["warn"]
+    "no-console": [0]
   }
 }

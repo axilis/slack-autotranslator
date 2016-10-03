@@ -8,10 +8,12 @@ const Promise = require('bluebird');
 class Database {
 
   constructor(dbPath) {
-    if (!fs.existsSync(dbPath)) {
-      throw new Error('Invalid database dbPath!');
+    try {
+      fs.accessSync(dbPath, fs.constants.R_OK | fs.constants.W_OK);
+    } catch(err) {
+      throw new Error(`Invalid database ${dbPath}`);
     }
-    this.db = new sqlite3.Database(path.resolve(dbPath, 'data.db'));
+    this.db = new sqlite3.Database(path.resolve(dbPath));
     this._initializeDatabase();
   }
 
@@ -82,6 +84,7 @@ class Database {
     return q(
       'SELECT * FROM messages WHERE channel = ? ORDER BY ts DESC LIMIT ?',
       [ channel, limit * 7 ]
+      // TODO: Better fetching of records
       // This constant is to ensure enough rows gets fetched so when
       // combined they end up as given number of messages.
       // This wouldn't work when messages on average have more than 7 rows,
@@ -107,13 +110,13 @@ class Database {
     );
   }
 
-  clearOld(channel) {
+  clearOld() {
     const now = (new Date()).getTime();
     const dayAgo = new Date(now - 3600 * 1000 * 24);
 
     this.db.run(
-      'DELETE FROM messages WHERE channel = ? AND ts < ?',
-      [ channel, dayAgo.getTime() / 1000 ]
+      'DELETE FROM messages WHERE ts < ?',
+      [ dayAgo.getTime() / 1000 ]
     );
   }
 

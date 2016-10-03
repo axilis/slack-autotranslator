@@ -1,4 +1,4 @@
-const Bot = require('slackbots');
+const WorkingBot = require('./working-bot');
 const Message = require('../database/models').Message;
 
 const {
@@ -14,7 +14,7 @@ const DEFAULT_COLOR = '#aaaaaa';
 const DEFAULT_NAME = '[unknown]';
 
 
-class TranslatorBot extends Bot {
+class TranslatorBot extends WorkingBot {
 
   constructor(settings) {
     super(settings);
@@ -23,10 +23,10 @@ class TranslatorBot extends Bot {
     this.targetLanguage = settings.targetLanguage;
     this.db = settings.database;
 
-    this.on('message', this.eventHandler.bind(this));
+    this.on('message', this._eventHandler.bind(this));
   }
 
-  eventHandler(event) {
+  _eventHandler(event) {
 
     // If event means that something changed, update those resources
     if (isChannelAction(event)) {

@@ -80,7 +80,7 @@ function translationsCommand(req, res) {
       }
 
       else {
-        const historyURL = req.app.get('historyURL');
+        const historyURL = req.app.get('baseURL') + req.app.get('historyURL');
         const [token, random] = req.app.get('tokenValidator').generateToken();
         const args = '/' + req.body.channel_id + '?token=' + token + '&random=' + random;
 
