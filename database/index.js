@@ -61,8 +61,8 @@ class Database {
     let counter = 0;
 
     for (const message of messages) {
-
-      if (message.user != lastAuthor || parseInt(message.ts, 10) - parseInt(entry.ts, 10) > TIME_SPAN * 60) {
+	
+      if (message.user != lastAuthor || parseInt(entry.ts, 10) - parseInt(message.ts, 10) > TIME_SPAN * 60) {
         counter += 1;
         lastAuthor = message.user;
         entry = message;
