@@ -19,7 +19,6 @@ Then using three slash commands (names are user-defined) get information you wan
 - contains optional language guesser which attempts to detect language based on provided keywords to avoid hitting Translator detection API when not needed
 - made to be run 24/7 (automatically restarts to prevent SSL expiration with free certificates, automatically reconnects after network outages)
 
----
 
 # Configuration
 
@@ -76,7 +75,9 @@ Descriptive label: Deletes stored data from translations.
 ```
 
 ### Bot configuration
-Bot requires `.env` file with configuration and optionally guesser configuration file.
+
+Main configuration of bot is stored in `.env` file located in main directory.
+Here is example configuration:
 
 ```
 SSL_KEY=/etc/letsencrypt/live/yourdomain.com/privkey.pem
@@ -103,11 +104,16 @@ DATABASE_PATH="../data.db"
 DATABASE_CACHE_TIME=24
 ```
 
-- Required `SSL` fields depend on certificate type and issuer therefore not all require `SSL_CA`. When using Letsencrypt or similar free certificate ensure that certificate is automatically updated upon expiration (in case of Letsencrypt every 3 months).
-- `DATABASE_CACHE_TIME` determines how long is data stored by bot so it could be retrieved translated.
-- `GUESSER_CONFIG` is not required but using it requires to create language guesser configuration.
+All fields except `GUESSER_CONFIG` are required.
 
-Example configuration for guessing language, `def.json` in this case of aforementioned configuration:
+- Which `SSL` fields are required depends on certificate type and issuer therefore not all certificates will require `SSL_CA`. When using Letsencrypt or similar free certificate ensure that certificate is automatically updated upon expiration (in case of Letsencrypt every 3 months).
+- `DATABASE_CACHE_TIME` determines how long is data stored by bot so it could be retrieved translated.
+- If `GUESSER_CONFIG` is provided it will use given file for language guesser configuration.
+
+Language guesser is part of translation part of bot that attempts to detect language rather than sending it to Translator API for detection.
+In many cases, language can be detected from sentence using just common language-specific words or letters.
+To use it, `GUESSER_CONFIG` variable needs to be defined and given file should contain valid JSON file.
+Following is an example of one such configuration that enables distinction between Croatian and English language.
 
 ```
 {
@@ -137,8 +143,7 @@ Example configuration for guessing language, `def.json` in this case of aforemen
 }
 ```
 
-*When creating guesser configuration keep in mind to only use words and letters that
-are mutually language exclusive.*
+*When choosing words and letters only use those that are mutually language exclusive.*
 
 ### Running bot
 
