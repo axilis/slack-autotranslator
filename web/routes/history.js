@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const TIME_SPAN = 10;
+const HISTORY_SPAN = 10;
 
 
 router.get('/:channel', _accessTokenValidatorMiddleware, (req, res) => {
@@ -29,7 +29,7 @@ function _groupMessagesByUser(rows) {
 
   for (const row of rows) {
 
-    if (row.user === lastAuthor && parseInt(row.ts, 10) - parseInt(entry.ts, 10) <= TIME_SPAN * 60) {
+    if (row.user === lastAuthor && parseInt(row.ts, 10) - parseInt(entry.ts, 10) <= HISTORY_SPAN * 60) {
       entry.text += '\n' + row.text;
       entry.translation += '\n' + row.translation;
     } else {

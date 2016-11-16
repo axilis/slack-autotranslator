@@ -4,6 +4,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const Promise = require('bluebird');
 
+const TIME_SPAN = 10;
 
 class Database {
 
@@ -61,7 +62,7 @@ class Database {
 
     for (const message of messages) {
 
-      if (message.user != lastAuthor) {
+      if (message.user != lastAuthor || parseInt(message.ts, 10) - parseInt(entry.ts, 10) > TIME_SPAN * 60) {
         counter += 1;
         lastAuthor = message.user;
         entry = message;
@@ -88,7 +89,7 @@ class Database {
       // TODO: Better fetching of records
       // This constant is to ensure enough rows gets fetched so when
       // combined they end up as given number of messages.
-      // This wouldn't work when messages on average have more than 7 rows,
+      // This wouldn't work when messages on average have more than 7 pieces,
       // but in all cases we observed that doesn't occour.
       // Should be improved in future but for prototype it is fine.
     )
