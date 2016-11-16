@@ -6,6 +6,8 @@ const PING_TIMEOUT = 4000; // ms
 
 /**
   * Reimplementation of connect to enable proper connection error handling.
+  * Default implementation takes too long or in some cases won't recognize
+  * connection being dropped.
   */
 class WorkingBot extends Bot {
 
@@ -17,7 +19,7 @@ class WorkingBot extends Bot {
     let lastResponse = new Date();
 
     // Capture pong responses
-    this.ws.on('message', function(resp) {
+    this.ws.on('message', (resp) => {
       if (JSON.parse(resp).type == 'pong') {
         lastResponse = new Date();
       }

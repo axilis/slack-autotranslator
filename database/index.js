@@ -7,13 +7,14 @@ const Promise = require('bluebird');
 
 class Database {
 
-  constructor(dbPath) {
+  constructor(dbPath, storagePeriod) {
     try {
       fs.accessSync(dbPath, fs.constants.R_OK | fs.constants.W_OK);
     } catch(err) {
       throw new Error(`Invalid database ${dbPath}`);
     }
     this.db = new sqlite3.Database(path.resolve(dbPath));
+    this.storagePeriod = storagePeriod;
     this._initializeDatabase();
   }
 
@@ -112,7 +113,7 @@ class Database {
 
   clearOld() {
     const now = (new Date()).getTime();
-    const dayAgo = new Date(now - 3600 * 1000 * 24);
+    const dayAgo = new Date(now - 3600 * 1000 * this.storagePeriod);
 
     this.db.run(
       'DELETE FROM messages WHERE ts < ?',

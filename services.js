@@ -1,6 +1,6 @@
-const TranslatorBot = require('./bot/translatorBot');
-const WebServer = require('./web/server');
-const Translator = require('./bot/translator');
+const TranslatorBot = require('./translator-bot');
+const WebApp = require('./web/server');
+const Translator = require('./translator');
 const Database = require('./database');
 
 const fs = require('fs');
@@ -14,20 +14,20 @@ function getVariable(variable) {
 
 function createDatabase() {
   const dbPath = getVariable('DATABASE_PATH');
-  return new Database(dbPath);
+  const storagePeriod = getVariable('DATABASE_CACHE_TIME');
+  return new Database(dbPath, storagePeriod);
 }
 
 function startDatabaseCleaningService(db) {
   const INTERVAL = 60 * 1000;
-  setInterval(function() {
+  setInterval(() => {
     db.clearOld();
   }, INTERVAL);
 }
 
-function createTranslator(id, secret, guesser) {
+function createTranslator(secret, guesser) {
   return new Translator({
-    clientId: id,
-    clientSecret: secret,
+    credentials: secret,
     guesser: guesser
   });
 }
@@ -39,8 +39,9 @@ function startSelfRestartingBot(db) {
 
   const BOT_TOKEN = getVariable('BOT_TOKEN');
   const BOT_NAME = getVariable('BOT_NAME');
+  const TARGET_LANGUAGE = getVariable('TARGET_LANGUAGE');
 
-  const TRANSLATOR_ID = getVariable('TRANSLATOR_ID');
+  // const TRANSLATOR_ID = getVariable('TRANSLATOR_ID');
   const TRANSLATOR_SECRET = getVariable('TRANSLATOR_SECRET');
 
   let guesser = null;
@@ -48,14 +49,14 @@ function startSelfRestartingBot(db) {
     const GUESSER_CONFIG = getVariable('GUESSER_CONFIG');
     guesser = JSON.parse(fs.readFileSync(GUESSER_CONFIG, 'utf8'));
   }
-  const translator = createTranslator(TRANSLATOR_ID, TRANSLATOR_SECRET, guesser);
+  const translator = createTranslator(TRANSLATOR_SECRET, guesser);
 
   function createBot() {
     console.log('Starting bot...');
 
     function spawnNewBot(err) {
       console.log('Bot died with an error:', err);
-      console.log(new Date() - lastRestart);
+      console.log('Bot lasted: ', ((new Date() - lastRestart) / 1000 / 60 / 60).toFixed(2), 'h');
 
       // Automatically increment timeout to prevent API rate limit
       if (new Date() - lastRestart > 2 * timeout) {
@@ -78,7 +79,7 @@ function startSelfRestartingBot(db) {
         token: BOT_TOKEN,
         name: BOT_NAME,
         translator,
-        targetLanguage: 'en',
+        targetLanguage: TARGET_LANGUAGE,
         database: db
       });
 
@@ -93,18 +94,18 @@ function startSelfRestartingBot(db) {
   createBot();
 }
 
-function startWebServer(db) {
-  WebServer.set('database', db);
-  WebServer.set('baseURL', getVariable('BASE_URL'));
+function startWebApp(db) {
+  WebApp.set('database', db);
+  WebApp.set('baseURL', getVariable('BASE_URL'));
 
-  WebServer.set('TOKEN_TRANSLATIONS', getVariable('TOKEN_TRANSLATIONS'));
-  WebServer.set('TOKEN_RECENT', getVariable('TOKEN_RECENT'));
-  WebServer.set('TOKEN_DELETE', getVariable('TOKEN_DELETE'));
+  WebApp.set('TOKEN_TRANSLATIONS', getVariable('TOKEN_TRANSLATIONS'));
+  WebApp.set('TOKEN_RECENT', getVariable('TOKEN_RECENT'));
+  WebApp.set('TOKEN_DELETE', getVariable('TOKEN_DELETE'));
 
 }
 
 module.exports = {
-  startWebServer,
+  startWebApp,
   startSelfRestartingBot,
   startDatabaseCleaningService,
   createDatabase

@@ -1,4 +1,4 @@
-const WorkingBot = require('./working-bot');
+const WorkingBot = require('./WorkingBot');
 const Message = require('../database/models').Message;
 
 const {
@@ -25,6 +25,7 @@ class TranslatorBot extends WorkingBot {
 
     this.on('message', this._eventHandler.bind(this));
   }
+
 
   _eventHandler(event) {
 
@@ -87,13 +88,12 @@ class TranslatorBot extends WorkingBot {
 
     this.translator.translate(message.text, this.targetLanguage)
       .then((translation) => {
-
         const user = this._getUserById(message.user);
         const processedMessage = new Message({
           channel: message.channel,
           user: message.user,
-          name: user.real_name || DEFAULT_NAME,
-          color: '#' + user.color || DEFAULT_COLOR,
+          name: user && user.real_name || DEFAULT_NAME,
+          color: user && ('#' + user.color) || DEFAULT_COLOR,
           text: message.text,
           translation: translation,
           ts: message.ts

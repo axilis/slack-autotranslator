@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 
 const RESTART_INTERVAL = 1000 * 60 * 60 * 24 * 3; // every 3 days
 
@@ -47,8 +46,8 @@ function startServer() {
 server = startServer();
 
 // Restart server every few days to ensure SSL certificates are up to date
-setInterval(function() {
-  server.close(function() {
+setInterval(() => {
+  server.close(() => {
     server = startServer();
   });
 
@@ -58,10 +57,9 @@ setInterval(function() {
 module.exports = app;
 
 
-/**
- * Normalize a port into a number, string, or false.
- */
-
+//
+// Standard Express server stuff
+//
 function normalizePort(val) {
   var port = parseInt(val, 10);
 
@@ -77,10 +75,6 @@ function normalizePort(val) {
 
   return false;
 }
-
-/**
- * Event listener for HTTP server "error" event.
- */
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -105,10 +99,6 @@ function onError(error) {
     throw error;
   }
 }
-
-/**
- * Event listener for HTTP server "listening" event.
- */
 
 function onListening() {
   var addr = server.address();

@@ -15,32 +15,18 @@ function deleteCommand(req, res) {
       response_type: 'in_channel',
       text: `Deleted translations from last ${hours} hours.`
     });
-  } else {
+  } else if (hours === 1) {
     res.json({
       response_type: 'in_channel',
       text: 'Deleted translations from last hour.'
     });
+  } else {
+    res.json({
+      response_type: 'in_channel',
+      text: 'Invalid number of hours.'
+    });
   }
 
-}
-
-
-function formatMessages(messages) {
-  return messages.map((message) => {
-    const element = {
-      fallback: message.translation,
-      text: message.translation,
-      title: message.name,
-      mrkdwn_in: ['text'],
-      color: message.color
-    };
-
-    if (message.translation !== message.text) {
-      element.footer = 'Translated';
-    }
-
-    return element;
-  });
 }
 
 function recentCommand(req, res) {
@@ -50,7 +36,7 @@ function recentCommand(req, res) {
   req.app.get('database').getRecentMessages(channel, count)
     .then((messages) => {
 
-      const attachments = formatMessages(messages);
+      const attachments = _formatMessages(messages);
 
       if (attachments.length !== 0) {
         return res.json({
@@ -58,14 +44,13 @@ function recentCommand(req, res) {
         });
       } else {
         return res.json({
-          text: 'No messages stored yet.\nCheck if bot is added to conversation.'
+          text: 'No recent messages or bot is not added to conversation.'
         });
       }
 
     });
 
 }
-
 
 function translationsCommand(req, res) {
   const channel = req.body.channel_id;
@@ -75,7 +60,7 @@ function translationsCommand(req, res) {
 
       if (messages.length == 0) {
         return res.json({
-          text: 'No messages stored yet.\nCheck if bot is added to conversation.'
+          text: 'No recent messages or bot is not added to conversation.'
         });
       }
 
@@ -91,6 +76,25 @@ function translationsCommand(req, res) {
 
     });
 
+}
+
+
+function _formatMessages(messages) {
+  return messages.map((message) => {
+    const element = {
+      fallback: message.translation,
+      text: message.translation,
+      title: message.name,
+      mrkdwn_in: ['text'],
+      color: message.color
+    };
+
+    if (message.translation !== message.text) {
+      element.footer = 'Translated';
+    }
+
+    return element;
+  });
 }
 
 

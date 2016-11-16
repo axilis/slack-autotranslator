@@ -1,32 +1,25 @@
-const TranslatorAPI = require('./translatorAPI');
-const LanguageGuesser = require('./languageGuesser');
+const TranslatorAPI = require('./TranslatorAPI');
+const LanguageGuesser = require('./LanguageGuesser');
 
 
 class Translator {
 
   constructor(settings) {
-
-    if (!settings.clientId) {
-      throw new Error('Missing clientId argument.');
+    if (!settings.credentials) {
+      throw new Error('Missing API credentials.');
     }
 
-    if (!settings.clientSecret) {
-      throw new Error('Missing clientSecret argument.');
-    }
-
-    this.settings = settings;
-    this.api = new TranslatorAPI(settings.clientId, settings.clientSecret);
+    this.api = new TranslatorAPI(settings.credentials);
 
     if (settings.guesser) {
       this.languageGuesser = new LanguageGuesser(settings.guesser);
     } else {
-      console.log('Using language guesser could benefit API call limits.');
+      console.log('Using language guesser can prevent part of API calls.');
     }
   }
 
   // Attempts to translate falling back to original text
   translate(text, targetLang) {
-
     return this._detectLanguage(text)
       .then((sourceLang) => {
         if (sourceLang !== targetLang) {
@@ -39,19 +32,17 @@ class Translator {
       .catch(() => {
         return text;
       });
-
   }
 
-  _detectLanguage(text) {
 
-    if (this.languageGuesser) {
-      return this.languageGuesser.guess(text).catch(() => {
+  _detectLanguage(text) {
+    if (this.guesser) {
+      return this.guesser.detect(text).catch(() => {
         return this.api.detect(text);
       });
     } else {
       return this.api.detect(text);
     }
-
   }
 
 }

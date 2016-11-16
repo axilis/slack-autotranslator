@@ -1,8 +1,6 @@
-// require('dotenv').config();
 
 var express = require('express');
 var path = require('path');
-// var favicon = require('serve-favicon');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 
@@ -16,7 +14,7 @@ if (!process.env.TRANSLATOR_SECRET) {
   throw new Error('Missing TRANSLATOR_SECRET variable.');
 }
 
-const TokenValidator = require('./validators/authorizationToken').TokenValidator;
+const TokenValidator = require('./validators/TokenValidator');
 const tokenValidator = new TokenValidator(process.env.TRANSLATOR_SECRET);
 app.set('tokenValidator', tokenValidator);
 
@@ -24,16 +22,13 @@ app.set('tokenValidator', tokenValidator);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// Ensure short keep-alive to enable server to restart itself for SSL
+// Ensure short keep-alive to enable server to quickly restart itself for SSL
 app.use(function(req, res, next) {
   res.set('Connection', 'Keep-Alive');
   res.set('Keep-Alive', 'timeout=10');
@@ -49,6 +44,11 @@ if (!process.env.HISTORY_URL) {
 app.use('/slack', slack);
 app.use(process.env.HISTORY_URL, history);
 app.set('historyURL', process.env.HISTORY_URL);
+
+
+//
+// Standard Express functions
+//
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

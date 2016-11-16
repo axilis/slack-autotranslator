@@ -14,13 +14,15 @@ const {
 } = require('../validators/slashCommands');
 
 
-// Slack commands are sometimes pinged to verify that SSL works.
-router.use(function(req, res, next) {
+// Middleware that handles typical problems that slack commands can experience.
+router.use((req, res, next) => {
+
+  // Slack commands are sometimes pinged to verify that SSL works.
   if (req.query.ssl_check) {
     return res.end('OK');
   }
 
-  // Close all slack connections.
+  // Prevent persistent HTTP connection.
   res.set('Connection', 'Close');
 
   // Wrap call of slack functions so user gets nice message
@@ -37,6 +39,5 @@ router.use(function(req, res, next) {
 router.post('/delete', tokenValidator('TOKEN_DELETE'), deleteValidator, deleteCommand);
 router.post('/recent', tokenValidator('TOKEN_RECENT'), recentValidator, recentCommand);
 router.post('/translations', tokenValidator('TOKEN_TRANSLATIONS'), translationsCommand);
-
 
 module.exports = router;

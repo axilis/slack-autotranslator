@@ -38,6 +38,4 @@ class TokenValidator {
 
 }
 
-module.exports = {
-  TokenValidator
-};
+module.exports = TokenValidator;

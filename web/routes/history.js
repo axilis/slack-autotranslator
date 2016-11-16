@@ -4,16 +4,14 @@ const router = express.Router();
 const TIME_SPAN = 10;
 
 
-router.get('/:channel', accessTokenValidator, function(req, res) {
-
+router.get('/:channel', _accessTokenValidatorMiddleware, (req, res) => {
   req.app.get('database').getAllMessages(req.params.channel)
-    .then((rows) => groupMessagesByUser(rows))
+    .then((rows) => _groupMessagesByUser(rows))
     .then((messages) => res.render('index.ejs', { messages }));
-
 });
 
 
-function accessTokenValidator(req, res, next) {
+function _accessTokenValidatorMiddleware(req, res, next) {
   const token = req.query.token;
   const random = req.query.random;
 
@@ -24,15 +22,14 @@ function accessTokenValidator(req, res, next) {
 }
 
 
-function groupMessagesByUser(rows) {
-  let lastAuthor = null;
+function _groupMessagesByUser(rows) {
   const selected = [];
-
+  let lastAuthor = null;
   let entry;
 
   for (const row of rows) {
 
-    if (row.user == lastAuthor && parseInt(row.ts) - parseInt(entry.ts) <= TIME_SPAN * 60) {
+    if (row.user === lastAuthor && parseInt(row.ts, 10) - parseInt(entry.ts, 10) <= TIME_SPAN * 60) {
       entry.text += '\n' + row.text;
       entry.translation += '\n' + row.translation;
     } else {

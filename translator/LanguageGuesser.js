@@ -1,3 +1,4 @@
+
 const DEFAULT_THRESHOLD = 0.15;
 
 
@@ -16,11 +17,11 @@ class LanguageGuesser {
     ];
   }
 
-  // Returns best matching language or null
-  guess(content) {
+  // Resolves with best matching language or rejects promise
+  detect(content) {
     return new Promise((resolve, reject) => {
-      const words = this.wordFrequency(content);
-      const guess = this.matchLanguages(content, words)[0];
+      const words = this._wordFrequency(content);
+      const guess = this._matchLanguages(content, words)[0];
 
       if (guess) {
         resolve(guess);
@@ -30,12 +31,13 @@ class LanguageGuesser {
     });
   }
 
+
   // Calculates match for each language
-  matchLanguages(content, words) {
+  _matchLanguages(content, words) {
     return this.sourceLanguages
       .map((language) => {
-        const wordScore = this.scoreWords(words, language.words);
-        const letterScore = (language.letters != undefined) ? this.scoreLetters(content, language.letters) : 0;
+        const wordScore = this._scoreWords(words, language.words);
+        const letterScore = (language.letters != undefined) ? this._scoreLetters(content, language.letters) : 0;
         const averageScore = (wordScore + letterScore) / 2.0;
 
         return {
@@ -49,7 +51,7 @@ class LanguageGuesser {
   }
 
   // Counts occurrence of each word
-  wordFrequency(content) {
+  _wordFrequency(content) {
 
     const occurrence = {};
     const words = content
@@ -65,7 +67,7 @@ class LanguageGuesser {
   }
 
   // Scores occurrences based on words that match
-  scoreWords(occurrence, language) {
+  _scoreWords(occurrence, language) {
     let total = 0;
     let matching = 0;
 
@@ -80,7 +82,7 @@ class LanguageGuesser {
   }
 
   // Scores letters based on number of letters that match language
-  scoreLetters(content, letters) {
+  _scoreLetters(content, letters) {
     let matching = 0;
 
     for (let i = 0; i < content.length; i++) {
