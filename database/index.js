@@ -53,7 +53,7 @@ class Database {
   }
 
 
-  _filterOutLast(messages, limit) {
+  _filterByGroupingLast(messages, limit) {
     let lastAuthor = null;
     const selected = [];
 
@@ -93,7 +93,7 @@ class Database {
       // but in all cases we observed that doesn't occour.
       // Should be improved in future but for prototype it is fine.
     )
-    .then((rows) => { return this._filterOutLast(rows, limit); })
+    .then((rows) => { return this._filterByGroupingLast(rows, limit); })
     .then((rows) => rows.sort((a, b) => a.ts - b.ts ));
   }
 
